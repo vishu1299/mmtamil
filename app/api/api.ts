@@ -14,12 +14,8 @@ export const getSuccessStories = async () => {
     try {
         const response = await customAxios().get(`mmm/user-web/admin/getStory/all`);
         return response;
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
-        throw new Error(
-            error?.response?.data?.message ||
-            "Unable to load success stories. Please check API configuration."
-        );
     }
 };
 

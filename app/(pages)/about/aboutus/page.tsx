@@ -12,8 +12,6 @@ interface AboutUsData {
 
 const AboutUs = () => {
   const [aboutUsData, setAboutUsData] = useState<AboutUsData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Add scroll handler
@@ -37,8 +35,6 @@ const AboutUs = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
         const data = await getAboutUsData();
         const responseData = data.data || data;
         const validData = Array.isArray(responseData)
@@ -60,31 +56,17 @@ const AboutUs = () => {
         setAboutUsData(sortedData);
       } catch (error) {
         console.error("Error fetching about us data:", error);
-        setError("Unable to load About page data.");
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        Loading...
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="flex justify-center items-center min-h-screen">{error}</div>;
-  }
-
+  // Add loading state indicator
   if (aboutUsData.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        No content available for About Us.
+        Loading...
       </div>
     );
   }

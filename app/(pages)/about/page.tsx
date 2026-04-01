@@ -13,7 +13,7 @@ const navLinks = [
   { label: "Success Stories", href: "/success-stories" },
   { label: "About", href: "/about" },
   { label: "Rules & Policies", href: "/privacyinfo" },
-  { label: "Support", href: "/support" },
+  { label: "Terms & Conditions", href: "/legal-terms" },
 ];
 
 const AboutHeader = () => {

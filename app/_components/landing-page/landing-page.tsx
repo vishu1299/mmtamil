@@ -178,7 +178,7 @@ const LandingPage: React.FC = () => {
       if (!hasAccessToken()) return;
       void updateUserDetails({
         profile: { appLanguage: localeToApiLanguage(next) },
-      }).catch(() => {});
+      }).catch(() => { });
     },
     [setLocale]
   );
@@ -200,10 +200,7 @@ const LandingPage: React.FC = () => {
                 height={10}
               />
             </Link>
-            <SocialLinks
-              variant="header"
-              className="hidden min-w-0 flex-1 justify-start overflow-x-auto md:flex lg:max-w-none"
-            />
+
           </div>
 
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3 md:gap-4">
@@ -221,11 +218,10 @@ const LandingPage: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-lg px-2 py-1.5 text-sm font-semibold tracking-wide outline-none transition-all duration-200 ease-out focus-visible:ring-2 focus-visible:ring-maroon/25 focus-visible:ring-offset-2 ${
-                    link.href === "/"
+                  className={`rounded-lg px-2 py-1.5 text-sm font-semibold tracking-wide outline-none transition-all duration-200 ease-out focus-visible:ring-2 focus-visible:ring-maroon/25 focus-visible:ring-offset-2 ${link.href === "/"
                       ? "text-maroon ring-1 ring-maroon/15 shadow-sm"
                       : "text-[#2C2C2C] hover:border hover:border-border-soft hover:bg-soft-rose/50 hover:text-maroon hover:shadow-soft"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>

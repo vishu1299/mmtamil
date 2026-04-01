@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { IoChevronBack } from "react-icons/io5";
@@ -8,6 +8,7 @@ import { FaHeart } from "react-icons/fa";
 import { FiBell } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { getSuccessStories } from "@/app/api/api";
+import { hasAccessToken } from "@/lib/auth/access-token";
 
 interface SuccessStory {
   id: number;
@@ -16,23 +17,93 @@ interface SuccessStory {
   groom: { name: string; image: string };
 }
 
+const dummyStories: SuccessStory[] = [
+  {
+    id: 1,
+    marriedOn: "Oct 2024",
+    bride: {
+      name: "Meena",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face",
+    },
+    groom: {
+      name: "Aravind",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+    },
+  },
+  {
+    id: 2,
+    marriedOn: "June 2024",
+    bride: {
+      name: "Regina",
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face",
+    },
+    groom: {
+      name: "Ronald",
+      image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&h=300&fit=crop&crop=face",
+    },
+  },
+  {
+    id: 3,
+    marriedOn: "June 2024",
+    bride: {
+      name: "Connie",
+      image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=300&h=300&fit=crop&crop=face",
+    },
+    groom: {
+      name: "Jorge",
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&fit=crop&crop=face",
+    },
+  },
+  {
+    id: 4,
+    marriedOn: "March 2024",
+    bride: {
+      name: "Priya",
+      image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=300&fit=crop&crop=face",
+    },
+    groom: {
+      name: "Karthik",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face",
+    },
+  },
+  {
+    id: 5,
+    marriedOn: "Jan 2024",
+    bride: {
+      name: "Anitha",
+      image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=300&fit=crop&crop=face",
+    },
+    groom: {
+      name: "Ravi",
+      image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=300&fit=crop&crop=face",
+    },
+  },
+];
+
 
 const SuccessStoriesPage = () => {
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!hasAccessToken()) {
+      const path = `${window.location.pathname}${window.location.search}`;
+      router.replace(`/login?redirect=${encodeURIComponent(path)}`);
+      return;
+    }
+    setAuthChecked(true);
+  }, [router]);
   const { data, isLoading, error } = useQuery({
     queryKey: ["success-stories"],
     queryFn: getSuccessStories,
   });
-  if (isLoading) {
+  if (isLoading || !authChecked) {
     return <div>Loading...</div>;
   }
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-  const successStories: SuccessStory[] = data?.data?.data?.stories ?? [];
-  if (successStories.length === 0) {
-    return <div className="text-center py-10">No success stories available right now.</div>;
-  }
+  const successStories = data?.data?.data?.stories;
   return (
     <div className="max-w-[1560px] min-h-screen w-full lg:w-[90%] mx-auto lg:py-6">
       {/* Mobile Header */}
