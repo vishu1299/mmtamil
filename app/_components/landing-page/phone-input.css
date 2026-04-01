@@ -1,0 +1,18 @@
+.phone-input-no-focus:focus,
+.phone-input-no-focus:focus-within {
+  outline: none !important;
+  border-color: #896e6e !important;
+  box-shadow: none !important;
+}
+
+.PhoneInputInput {
+  border: none !important;
+  outline: none !important;
+  background: none !important;
+}
+
+.PhoneInputInput:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
