@@ -11,7 +11,6 @@ const navLinks = [
   { label: "Home", href: "/" },
   // { label: "Search", href: "/search" },
   { label: "Success Stories", href: "/success-stories" },
-  { label: "About", href: "/about" },
   { label: "Rules & Policies", href: "/privacyinfo" },
   { label: "Terms & Conditions", href: "/legal-terms" },
 ];
@@ -37,11 +36,7 @@ const AboutHeader = () => {
               <Link
                 key={link.label}
                 href={link.href}
-                className={`text-sm font-semibold tracking-wide transition-colors ${
-                  link.href === "/about"
-                    ? "text-maroon"
-                    : "text-[#2C2C2C] hover:text-maroon"
-                }`}
+                className="text-sm font-semibold tracking-wide transition-colors text-[#2C2C2C] hover:text-maroon"
                 {...(isPolicyPageHref(link.href) ? POLICY_PAGE_NEW_TAB : {})}
               >
                 {link.label}

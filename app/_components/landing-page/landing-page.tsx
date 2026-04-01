@@ -131,7 +131,6 @@ const LandingPage: React.FC = () => {
       { label: t("navHome"), href: "/" },
       { label: t("navSearch"), href: "/search" },
       { label: t("navSuccessStories"), href: "/success-stories" },
-      { label: t("navAbout"), href: "/about" },
     ],
     [t]
   );

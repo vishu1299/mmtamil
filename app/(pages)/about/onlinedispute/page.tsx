@@ -13,6 +13,8 @@ interface AboutUsData {
 
 const OnlineDispute = () => {
   const [aboutUsData, setAboutUsData] = useState<AboutUsData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Add scroll handler
@@ -36,6 +38,8 @@ const OnlineDispute = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const data = await getAboutUsData();
         const responseData = data.data || data;
         const validData = Array.isArray(responseData)
@@ -50,17 +54,31 @@ const OnlineDispute = () => {
         setAboutUsData(sortedData);
       } catch (error) {
         console.error("Error fetching about us data:", error);
+        setError("Unable to load Online Dispute data.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  // Add loading state indicator
-  if (aboutUsData.length === 0) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen">{error}</div>;
+  }
+
+  if (aboutUsData.length === 0) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        No content available for Online Dispute.
       </div>
     );
   }

@@ -14,7 +14,6 @@ export function LegalTermsNav() {
   const navLinks = [
     { href: "/", label: t("navHome") },
     { href: "/privacyinfo", label: t("navRulesPolicies") },
-    { href: "/about", label: t("navTransparency") },
     { href: "/support", label: t("navGuides") },
   ] as const;
 

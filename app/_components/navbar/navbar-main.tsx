@@ -31,7 +31,6 @@ const NavbarMain = () => {
       {pathname !== "/" &&
         pathname !== "/login" &&
         pathname !== "/loginstep" &&
-        pathname !== "/about" &&
         pathname !== "/legal-terms" &&
         pathname !== "/privacyinfo" &&
         pathname !== "/support" &&

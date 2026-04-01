@@ -44,15 +44,12 @@ const FAQHeader = () => {
 
             <ul className="hidden md:flex items-center gap-4 md:gap-8">
               <li className="cursor-pointer hover:text-[#e6246b] text-sm md:text-md lg:text-lg xl:text-xl">
-                <Link href="/about">Home</Link>
+                <Link href="/">Home</Link>
               </li>
               <li className="cursor-pointer hover:text-[#e6246b] text-sm md:text-md lg:text-lg xl:text-xl">
                 <Link href="/privacyinfo" {...POLICY_PAGE_NEW_TAB}>
                   Rules and Policies
                 </Link>
-              </li>
-              <li className="cursor-pointer hover:text-[#e6246b] text-sm md:text-md lg:text-lg xl:text-xl">
-                <Link href="/about">Transparency</Link>
               </li>
               <li className="cursor-pointer hover:text-[#e6246b] text-sm md:text-md lg:text-lg xl:text-xl">
                 <Link href="/support">Educational Guides</Link>

@@ -1,15 +1,6 @@
 export const NavItem = [
   {
     id: 1,
-    navHeading: "About",
-    menuOptions: [
-      { value: "About us", url: "/about" },
-      { value: "Community Guidelines", url: "/about/#community-guidelines" },
-      { value: "Online Dispute Resolution", url: "/about/#online-dispute-resolution" },
-    ],
-  },
-  {
-    id: 2,
     navHeading: "Legal terms",
     menuOptions: [
       { value: "Terms of Use", url: "/legal-terms" },
@@ -18,7 +9,7 @@ export const NavItem = [
     ],
   },
   {
-    id: 3,
+    id: 2,
     navHeading: "Privacy info",
     menuOptions: [
       { value: "Privacy Policy", url: "/privacyinfo" },
@@ -26,7 +17,7 @@ export const NavItem = [
     ],
   },
   {
-    id: 4,
+    id: 3,
     navHeading: "Support",
     menuOptions: [
       { value: "Support Email", url: "mailto:support@xcrino.com" },
