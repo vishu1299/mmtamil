@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { IoChevronBack } from "react-icons/io5";
 import { FiSettings } from "react-icons/fi";
@@ -8,6 +9,7 @@ import Notifications from "./_components/notifications";
 
 const Page = () => {
   const router = useRouter();
+  const t = useTranslations("notifications");
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-[1560px] flex-1 flex-col lg:w-[90%] lg:py-6">
@@ -22,7 +24,7 @@ const Page = () => {
             <IoChevronBack className="text-2xl" />
           </button>
           <h1 className="font-playfair text-xl font-semibold text-[#2C2C2C]">
-            Notification
+            {t("titleMobile")}
           </h1>
         </div>
         <button
@@ -36,11 +38,9 @@ const Page = () => {
       {/* Desktop Header */}
       <div className="mb-5 hidden rounded-2xl border border-border-soft bg-gradient-to-br from-white to-cream/30 px-4 py-5 shadow-card transition-all duration-300 hover:shadow-card-hover lg:block lg:px-6">
         <h1 className="font-playfair text-[28px] font-semibold tracking-tight text-maroon">
-          Notifications
+          {t("title")}
         </h1>
-        <p className="mt-1 text-sm text-[#6B6B6B]">
-          Stay updated with your matches and activity
-        </p>
+        <p className="mt-1 text-sm text-[#6B6B6B]">{t("subtitle")}</p>
       </div>
 
       <Notifications />

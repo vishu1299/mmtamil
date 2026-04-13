@@ -292,7 +292,7 @@ const EditProfilePage = () => {
 
   const openGalleryPicker = () => {
     if (!userId) {
-      toast.error("Could not load your profile. Please refresh the page.");
+      toast.error(t("toastProfileLoadError"));
       return;
     }
     galleryFileInputRef.current?.click();
@@ -300,7 +300,7 @@ const EditProfilePage = () => {
 
   const openProfilePicturePicker = () => {
     if (!userId) {
-      toast.error("Could not load your profile. Please refresh the page.");
+      toast.error(t("toastProfileLoadError"));
       return;
     }
     profilePicInputRef.current?.click();
@@ -330,12 +330,12 @@ const EditProfilePage = () => {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024 * 1024) {
-      toast.error("Image must be less than 2Gb");
+      toast.error(t("toastImageTooLargeProfile"));
       return;
     }
 
     setUploadingProfilePicture(true);
-    toast.info("Uploading profile picture...");
+    toast.info(t("toastUploadingProfilePic"));
     try {
       const res = await uploadProfilePicture(file);
       const uploadedUrl = resolveProfilePictureUrl(res);
@@ -387,12 +387,12 @@ const EditProfilePage = () => {
 
     const tooLarge = files.some((f) => f.size > 2 * 1024 * 1024 * 1024);
     if (tooLarge) {
-      toast.error("Each image must be less than 2Gb");
+      toast.error(t("toastImageTooLargeGallery"));
       return;
     }
 
     setUploadingPhotos(true);
-    toast.info("Uploading photos...");
+    toast.info(t("toastUploadingPhotos"));
     try {
       await uploadGalleryImages(files);
       toast.success(t("toastUploadGalleryOk"));
@@ -474,13 +474,13 @@ const EditProfilePage = () => {
     setProfile(merged);
 
     setIsSaving(true);
-    toast.info("Saving profile...");
+    toast.info(t("toastSavingProfile"));
     try {
       const payload = buildUpdatePayload(merged);
       const result = await updateUserDetails(payload);
       const code = result?.code ?? result?.status;
       if (code === 200 || code === 201) {
-        toast.success("Profile updated successfully!");
+        toast.success(t("toastProfileUpdateOk"));
         setRawUser((prev) =>
           prev
             ? {
@@ -496,10 +496,10 @@ const EditProfilePage = () => {
             : prev
         );
       } else {
-        toast.error("Failed to update profile. Please try again.");
+        toast.error(t("toastProfileUpdateFail"));
       }
     } catch {
-      toast.error("Failed to update profile. Please try again.");
+      toast.error(t("toastProfileUpdateFail"));
     } finally {
       setIsSaving(false);
     }
@@ -629,8 +629,8 @@ const EditProfilePage = () => {
               onChange={handleProfilePictureSelected}
             />
 
-            <p className="text-center text-[22px] leading-tight text-[#4B5563] font-medium">
-              Make a great first impression with a clear, friendly photo
+            <p className="text-center text-[22px] font-medium leading-tight text-[#4B5563]">
+              {t("photoHero")}
             </p>
 
             <div className="mt-5 flex justify-center">
@@ -643,7 +643,7 @@ const EditProfilePage = () => {
                 <div className="absolute inset-0 rounded-full overflow-hidden">
                   <Image
                     src={profile.profilePicture}
-                    alt="Profile picture"
+                    alt={t("profilePictureAlt")}
                     fill
                     className="object-cover"
                     unoptimized
@@ -710,7 +710,9 @@ const EditProfilePage = () => {
                   unoptimized
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent py-2.5 px-3">
-                  <span className="text-white text-xs font-medium">Profile Picture</span>
+                  <span className="text-xs font-medium text-white">
+                    {t("profilePicture")}
+                  </span>
                 </div>
               </button>
 
@@ -725,14 +727,21 @@ const EditProfilePage = () => {
                     onClick={() => setViewerIndex(i + 1)}
                     className="absolute inset-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-maroon/50 focus:ring-offset-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    <Image src={photo.url} alt={`Gallery ${i + 1}`} fill className="object-cover" sizes="144px" unoptimized />
+                    <Image
+                      src={photo.url}
+                      alt={t("galleryImageAlt", { number: i + 1 })}
+                      fill
+                      className="object-cover"
+                      sizes="144px"
+                      unoptimized
+                    />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDeleteGalleryPhoto(photo.id)}
                     disabled={deletingPhotoId === photo.id}
                     className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/75 transition-colors disabled:opacity-60"
-                    aria-label={`Delete Gallery ${i + 1}`}
+                    aria-label={t("deleteGalleryAria", { number: i + 1 })}
                   >
                     <FiTrash2 className="text-sm" />
                   </button>
@@ -807,7 +816,9 @@ const EditProfilePage = () => {
             onIndexChange={(i) => setViewerIndex(i)}
             labels={[
               t("profilePicture"),
-              ...galleryPhotos.map((_, i) => `Gallery ${i + 1}`),
+              ...galleryPhotos.map((_, i) =>
+                t("galleryLabel", { number: i + 1 })
+              ),
             ]}
           />
         )}

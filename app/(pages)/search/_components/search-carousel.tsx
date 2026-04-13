@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -68,6 +69,7 @@ const SearchCarousel = forwardRef<
   }
 >(({ profiles, onSkip, onLike, hasActivePackage, onPackageRequired }, ref) => {
   const router = useRouter();
+  const t = useTranslations("search");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState<SwipeDirection>(null);
@@ -183,7 +185,7 @@ const SearchCarousel = forwardRef<
           <div className="w-16 h-16 bg-soft-rose rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-maroon text-2xl font-bold">?</span>
           </div>
-          <p className="text-[#6B6B6B]">No profiles to show</p>
+          <p className="text-[#6B6B6B]">{t("carouselEmpty")}</p>
         </div>
       </div>
     );
@@ -211,7 +213,9 @@ const SearchCarousel = forwardRef<
           <Card
             role="button"
             tabIndex={0}
-            aria-label={`View profile, ${activeProfile.userName}`}
+            aria-label={t("carouselViewProfileAria", {
+              name: activeProfile.userName,
+            })}
             className="group relative aspect-[2/3] cursor-pointer overflow-hidden rounded-2xl border border-border-soft shadow-card outline-none transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-card-hover hover:ring-2 hover:ring-maroon/25 focus-visible:ring-2 focus-visible:ring-maroon/40 focus-visible:ring-offset-2 motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:transition-shadow"
             onClick={handleViewProfile}
             onKeyDown={(e) => {
@@ -227,7 +231,7 @@ const SearchCarousel = forwardRef<
                 src={displayImg}
                 fill
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:group-hover:scale-100"
-                alt={`${activeProfile.userName}-photo`}
+                alt={t("carouselPhotoAlt", { name: activeProfile.userName })}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-b from-soft-rose to-cream flex flex-col items-center justify-center">
@@ -236,15 +240,17 @@ const SearchCarousel = forwardRef<
                     {initials}
                   </span>
                 </div>
-                <p className="text-[#6B6B6B] text-sm">No photos available</p>
+                <p className="text-sm text-[#6B6B6B]">
+                  {t("carouselNoPhotos")}
+                </p>
               </div>
             )}
 
             {swipeDirection === "left" && (
               <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
                 <div className="border-4 border-red-500 rounded-xl px-6 py-2 rotate-[-20deg] opacity-90">
-                  <span className="text-red-500 font-extrabold text-5xl tracking-wider">
-                    NOPE
+                  <span className="text-5xl font-extrabold tracking-wider text-red-500">
+                    {t("carouselSwipeNope")}
                   </span>
                 </div>
               </div>
@@ -252,8 +258,8 @@ const SearchCarousel = forwardRef<
             {swipeDirection === "right" && (
               <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
                 <div className="border-4 border-green-500 rounded-xl px-6 py-2 rotate-[20deg] opacity-90">
-                  <span className="text-green-500 font-extrabold text-5xl tracking-wider">
-                    LIKE
+                  <span className="text-5xl font-extrabold tracking-wider text-green-500">
+                    {t("carouselSwipeLike")}
                   </span>
                 </div>
               </div>
@@ -311,8 +317,10 @@ const SearchCarousel = forwardRef<
 
 SearchCarousel.displayName = "SearchCarousel";
 
-const SearchAboutProfile = ({ profile }: { profile: User }) => (
-  <div className="xl:w-[400px] w-full mt-2">
+const SearchAboutProfile = ({ profile }: { profile: User }) => {
+  const t = useTranslations("search");
+  return (
+  <div className="mt-2 w-full xl:w-[400px]">
     <div className="flex w-full flex-wrap items-center gap-2.5 rounded-2xl border border-border-soft bg-cream px-4 py-4 shadow-sm transition-shadow duration-300 hover:shadow-md sm:gap-3">
       {profile?.profile?.country && (
         <div className="flex items-center gap-1.5 rounded-full border border-border-soft bg-white px-3 py-1.5 text-sm text-[#2C2C2C] shadow-sm transition-shadow duration-200 hover:shadow">
@@ -343,13 +351,16 @@ const SearchAboutProfile = ({ profile }: { profile: User }) => (
     </div>
     {profile?.profile?.bio && (
       <div className="mt-3 flex flex-col gap-y-3 rounded-xl border border-border-soft bg-white px-4 py-4 shadow-sm transition-shadow duration-300 hover:shadow-md">
-        <p className="font-playfair text-lg font-semibold text-maroon">About</p>
+        <p className="font-playfair text-lg font-semibold text-maroon">
+          {t("carouselAboutSection")}
+        </p>
         <p className="rounded-lg border-l-4 border-maroon bg-cream p-3 text-sm leading-relaxed text-[#2C2C2C]">
           {profile.profile.bio}
         </p>
       </div>
     )}
   </div>
-);
+  );
+};
 
 export default SearchCarousel;

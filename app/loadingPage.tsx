@@ -1,7 +1,11 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from "next-intl";
 import "./loadingPage.css";
 
 const LoadingPage = () => {
+  const t = useTranslations("loadingPage");
   return (
     <div className="loading-page">
       <div className="loading-content">
@@ -12,9 +16,7 @@ const LoadingPage = () => {
           </span>
         </div>
 
-        <div className="loading-message">
-          Just a moment &mdash; we&apos;re getting things ready
-        </div>
+        <div className="loading-message">{t("message")}</div>
         <div className="loading-dots">
           <span></span>
           <span></span>

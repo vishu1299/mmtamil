@@ -10,7 +10,6 @@ import {
 import { User } from "./type/type";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter, useSearchParams } from "next/navigation";
-import WelcomeCreditsPopup from "./welcome-credits/welcome-credits-popup";
 import { hasAccessToken } from "@/lib/auth/access-token";
 import {
   parseLandingSearchParams,
@@ -367,7 +366,6 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="px-2 lg:px-0">
-      <WelcomeCreditsPopup />
 
       {!data ? (
         <div className="flex flex-wrap justify-center w-full gap-4 mt-6">

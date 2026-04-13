@@ -27,6 +27,10 @@ import {
   SRILANKA,
   SRILANKA_DISTRICTS,
 } from "@/lib/landing-country-options";
+import {
+  countryMessageKey,
+  districtMessageKey,
+} from "@/lib/landing-country-i18n";
 import { SocialLinks } from "@/app/_components/social-links";
 
 const RELIGION_VALUES = [
@@ -443,7 +447,7 @@ const LandingPage: React.FC = () => {
                   <SelectContent className="max-h-[min(320px,70vh)]">
                     {COUNTRY_OPTIONS.map((c) => (
                       <SelectItem key={c} value={c}>
-                        {c}
+                        {t(countryMessageKey[c])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -473,7 +477,7 @@ const LandingPage: React.FC = () => {
                     <SelectContent className="max-h-[min(320px,70vh)]">
                       {SRILANKA_DISTRICTS.map((d) => (
                         <SelectItem key={d} value={d}>
-                          {d}
+                          {t(districtMessageKey[d])}
                         </SelectItem>
                       ))}
                     </SelectContent>

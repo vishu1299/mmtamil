@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { IoChevronBack } from "react-icons/io5";
 import { FiImage, FiUser } from "react-icons/fi";
@@ -25,6 +26,7 @@ interface UserPaymentItem {
 
 const PremiumPage = () => {
   const router = useRouter();
+  const t = useTranslations("premium");
   const [loading, setLoading] = useState(true);
   const [profileShowLimit, setProfileShowLimit] = useState(0);
   const [contactViewLimit, setContactViewLimit] = useState(0);
@@ -89,32 +91,30 @@ const PremiumPage = () => {
           <IoChevronBack className="text-2xl" />
         </button>
         <h1 className="font-playfair text-xl font-semibold text-[#2C2C2C]">
-          Premium
+          {t("title")}
         </h1>
       </div>
 
       {/* Desktop Header */}
       <div className="mb-5 hidden rounded-2xl border border-border-soft bg-gradient-to-br from-white to-cream/30 px-4 py-5 shadow-card transition-all duration-300 hover:shadow-card-hover lg:block lg:px-6">
         <h1 className="font-playfair text-[28px] font-semibold tracking-tight text-maroon">
-          Premium
+          {t("title")}
         </h1>
-        <p className="mt-1 text-sm text-[#6B6B6B]">
-          Your balance and premium features
-        </p>
+        <p className="mt-1 text-sm text-[#6B6B6B]">{t("subtitle")}</p>
       </div>
 
       {/* Content */}
       <div className="px-4 pb-24 lg:px-0">
         <div className="mb-4 flex items-center justify-between rounded-xl border border-border-soft bg-white px-4 py-3 shadow-soft">
           <h2 className="font-playfair text-lg font-semibold text-[#2C2C2C]">
-            Your Balance
+            {t("yourBalance")}
           </h2>
           <button
             type="button"
             onClick={() => router.push("/credits")}
             className="rounded-xl border-2 border-maroon/25 bg-maroon px-5 py-2.5 text-sm font-semibold text-white shadow-maroon transition-all duration-200 hover:bg-maroon/92 hover:shadow-maroon-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon/40 focus-visible:ring-offset-2 motion-reduce:hover:translate-y-0"
           >
-            {hasPremium ? "Upgrade" : "Get Premium"}
+            {hasPremium ? t("upgrade") : t("getPremium")}
           </button>
         </div>
 
@@ -125,8 +125,11 @@ const PremiumPage = () => {
         ) : (
           <>
             {packageName && (
-              <p className="text-sm text-[#6B6B6B] mb-3">
-                Package: <span className="text-[#2C2C2C] font-medium">{packageName}</span>
+              <p className="mb-3 text-sm text-[#6B6B6B]">
+                {t("packagePrefix")}{" "}
+                <span className="font-medium text-[#2C2C2C]">
+                  {packageName}
+                </span>
               </p>
             )}
             <div className="overflow-hidden rounded-2xl border-2 border-border-soft bg-white shadow-card transition-all duration-300 hover:border-maroon/15 hover:shadow-card-hover">
@@ -135,7 +138,9 @@ const PremiumPage = () => {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-maroon/10 bg-soft-rose text-maroon shadow-sm">
                     <FiImage className="text-lg" />
                   </div>
-                  <span className="text-sm font-medium text-[#2C2C2C]">Photo View</span>
+                  <span className="text-sm font-medium text-[#2C2C2C]">
+                    {t("photoView")}
+                  </span>
                 </div>
                 <span className="text-sm font-semibold text-[#2C2C2C]">
                   {profileShowLimit}
@@ -146,7 +151,9 @@ const PremiumPage = () => {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-maroon/10 bg-soft-rose text-maroon shadow-sm">
                     <FiUser className="text-lg" />
                   </div>
-                  <span className="text-sm font-medium text-[#2C2C2C]">Contact View</span>
+                  <span className="text-sm font-medium text-[#2C2C2C]">
+                    {t("contactView")}
+                  </span>
                 </div>
                 <span className="text-sm font-semibold text-[#2C2C2C]">
                   {contactViewLimit}
@@ -156,12 +163,13 @@ const PremiumPage = () => {
 
             {expireOn ? (
               <p className="mt-4 text-sm text-[#6B6B6B]">
-                Expire on: <span className="text-[#2C2C2C] font-medium">{expireOn}</span>
+                {t("expireOnPrefix")}{" "}
+                <span className="font-medium text-[#2C2C2C]">{expireOn}</span>
               </p>
             ) : (
               !hasPremium && (
                 <p className="mt-4 text-sm text-[#6B6B6B]">
-                  You don&apos;t have an active premium package. Upgrade to get Photo View and Contact View.
+                  {t("noActivePackage")}
                 </p>
               )
             )}

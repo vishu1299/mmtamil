@@ -85,24 +85,40 @@ const CITIZENSHIP_OPTIONS = [
   { value: "Other", key: "other" as const },
 ];
 
-/** ISO `YYYY-MM-DD` from `<input type="date" />` → completed age in years. */
-function getAgeYearsFromIsoDate(dobIso: string): number | null {
-  const trimmed = dobIso.trim();
-  if (!trimmed) return null;
-  const d = new Date(`${trimmed}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - d.getFullYear();
-  const monthDiff = today.getMonth() - d.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < d.getDate())) {
-    age -= 1;
+/** Parse `YYYY-MM-DD` as a local calendar date; returns null if invalid (e.g. 2006-02-30). */
+function parseStrictLocalYmd(iso: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const dt = new Date(y, mo - 1, d);
+  if (
+    dt.getFullYear() !== y ||
+    dt.getMonth() !== mo - 1 ||
+    dt.getDate() !== d
+  ) {
+    return null;
   }
-  return age;
+  return dt;
 }
 
-function isAtLeast18(dobIso: string): boolean {
-  const age = getAgeYearsFromIsoDate(dobIso);
-  return age !== null && age >= 18;
+/** Latest birth date still allowed: same month/day as today, 18 years ago (local). */
+function getMaxBirthDateForMinAge18(): Date {
+  const t = new Date();
+  return new Date(t.getFullYear() - 18, t.getMonth(), t.getDate());
+}
+
+function formatLocalYmd(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Allowed: exactly 18 today or older; not allowed: under 18 (any birth date after cutoff). */
+function isDobAtLeast18(dobIso: string): boolean {
+  const birth = parseStrictLocalYmd(dobIso);
+  if (!birth) return false;
+  const cutoff = getMaxBirthDateForMinAge18();
+  return birth.getTime() <= cutoff.getTime();
 }
 
 const Step3 = () => {
@@ -111,20 +127,16 @@ const Step3 = () => {
   const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const maxDobIso = useMemo(() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - 18);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  }, []);
+  const maxDobIso = useMemo(
+    () => formatLocalYmd(getMaxBirthDateForMinAge18()),
+    []
+  );
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
     if (!data.dateOfBirth?.trim()) {
       nextErrors.dateOfBirth = t("errDob");
-    } else if (!isAtLeast18(data.dateOfBirth)) {
+    } else if (!isDobAtLeast18(data.dateOfBirth)) {
       nextErrors.dateOfBirth = t("errDobMin18");
     }
     if (!data.nativeCountry) nextErrors.nativeCountry = t("errNativeCountry");

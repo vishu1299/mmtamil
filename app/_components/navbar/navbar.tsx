@@ -63,7 +63,7 @@ const Navbar = () => {
               
             </div>
 
-            <div className="flex shrink-0">
+            <div className="flex shrink-0 gap-4">
               {navItems.map((item) => {
                 const isActive = path === item.path;
                 return (

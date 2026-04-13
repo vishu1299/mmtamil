@@ -1,6 +1,8 @@
 "use client";
+
 import { customAxios } from "@/utils/axios-interceptor";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 interface Payment {
@@ -13,15 +15,34 @@ interface Payment {
   initiatedDate: string;
 }
 
+type PaymentStatusMsgKey =
+  | "statusPending"
+  | "statusSuccessful"
+  | "statusInitiated"
+  | "statusRejected"
+  | "statusApproved";
+
+const PAYMENT_STATUS_KEYS: Record<Payment["status"], PaymentStatusMsgKey> = {
+  PENDING: "statusPending",
+  SUCCESSFULL: "statusSuccessful",
+  INITIATED: "statusInitiated",
+  REJECTED: "statusRejected",
+  APPROVED: "statusApproved",
+};
+
 const Payment = () => {
+  const t = useTranslations("payments");
+  const tc = useTranslations("common");
+  const locale = useLocale();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const dateLocale = locale === "ta" ? "ta-IN" : "en-IN";
 
   useEffect(() => {
     const fetchPayments = async () => {
       try {
         const response = await customAxios().get("mmm/payment/getallpayment");
-        console.log('Payment Response:', response.data); // Add this line
         setPayments(response.data.data);
       } catch (error) {
         console.error("Error fetching payments:", error);
@@ -34,53 +55,62 @@ const Payment = () => {
   }, []);
 
   return (
-    <div className="mb-4 lg:mb-0 px-4 ">
-      <p className=" text-[#333] font-semibold text-[24px] py-2">My Payments</p>
-      <div className="flex justify-between gap-8  ">
-        <div className=" w-full shadow-md bg-[#fff]  ">
+    <div className="mb-4 px-4 lg:mb-0">
+      <p className="py-2 text-[24px] font-semibold text-[#333]">{t("title")}</p>
+      <div className="flex justify-between gap-8">
+        <div className="w-full bg-[#fff] shadow-md">
           <div>
-            <div className="flex gap-4 sm:pl-4 justify-start items-center border-b-2 py-4">
-              <div className="text-[#525252] text-2xl"></div>
+            <div className="flex items-center justify-start gap-4 border-b-2 py-4 sm:pl-4">
+              <div className="text-2xl text-[#525252]"></div>
               <div>
-                <p className="text-[#525252] font-semibold text-xl">
-                  Billing history
+                <p className="text-xl font-semibold text-[#525252]">
+                  {t("billingHistory")}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex justify-center items-center sm:my-16 my-8 w-full">
+          <div className="my-8 flex w-full items-center justify-center sm:my-16">
             {loading ? (
-              <div>Loading...</div>
+              <div>{tc("loading")}</div>
             ) : payments && payments.length > 0 ? (
               <div className="w-full px-4">
                 {payments.map((payment, index) => (
-                  <div key={payment.id || index} className="border rounded-lg py-4 bg-white shadow transition-all px-6 mb-4 hover:shadow-xl">
-                    <div className="flex justify-between items-start">
+                  <div
+                    key={payment.id || index}
+                    className="mb-4 rounded-lg border bg-white px-6 py-4 shadow transition-all hover:shadow-xl"
+                  >
+                    <div className="flex items-start justify-between">
                       <div className="space-y-2">
-                        <p className="text-[#333] font-semibold text-base">
-                          Transaction ID: {payment.transactionID}
+                        <p className="text-base font-semibold text-[#333]">
+                          {t("transactionId")}{" "}
+                          {payment.transactionID}
                         </p>
-                        <div className="text-[#525252] text-sm">
+                        <div className="text-sm text-[#525252]">
                           {payment.method}
                         </div>
-                        <p className="text-[#525252] text-sm">
-                          Status: <span className="font-medium">{payment.status}</span>
+                        <p className="text-sm text-[#525252]">
+                          {t("statusLabel")}{" "}
+                          <span className="font-medium">
+                            {t(PAYMENT_STATUS_KEYS[payment.status])}
+                          </span>
                         </p>
-                        <p className="text-[#525252] text-sm">
-                          Quantity: <span className="font-medium">{payment.coins}</span>               
+                        <p className="text-sm text-[#525252]">
+                          {t("quantityLabel")}{" "}
+                          <span className="font-medium">{payment.coins}</span>
                         </p>
                       </div>
                       <div className="text-right">
-                        
-                        <p className="text-[#6B7280] text-sm">
-                          {new Date(payment.initiatedDate).toLocaleString('en-US', {
-                            weekday: 'long',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
+                        <p className="text-sm text-[#6B7280]">
+                          {new Date(
+                            payment.initiatedDate
+                          ).toLocaleString(dateLocale, {
+                            weekday: "long",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
                           })}
                         </p>
-                        <p className="text-[#333] font-semibold text-lg mb-2 mt-8">
+                        <p className="mb-2 mt-8 text-lg font-semibold text-[#333]">
                           ${Number(payment.amount).toFixed(2)}
                         </p>
                       </div>
@@ -89,19 +119,19 @@ const Payment = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col justify-center items-center">
+              <div className="flex flex-col items-center justify-center">
                 <Image
                   src="/assets/images/payments/img1.png"
-                  alt="img"
+                  alt={t("emptyIllustrationAlt")}
                   width={244}
                   height={244}
                   className="h-[150px] w-[150px] lg:h-[244px] lg:w-[244px]"
                 />
-                <p className="text-[#333] text-[20px] font-semibold mt-4 text-center mx-2">
-                  No billing history
+                <p className="mx-2 mt-4 text-center text-[20px] font-semibold text-[#333]">
+                  {t("emptyTitle")}
                 </p>
-                <p className="text-[#525252] text-center mx-2">
-                  Your transactions will appear here.
+                <p className="mx-2 text-center text-[#525252]">
+                  {t("emptyHint")}
                 </p>
               </div>
             )}

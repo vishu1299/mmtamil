@@ -30,6 +30,12 @@ import {
   SRILANKA,
   SRILANKA_DISTRICTS,
 } from "@/lib/landing-country-options";
+import {
+  countryMessageKey,
+  districtMessageKey,
+  isCountryOption,
+} from "@/lib/landing-country-i18n";
+import { useAppLocale } from "@/app/_components/i18n/locale-provider";
 import { User } from "../type/type";
 import { useSearchParams } from "next/navigation";
 import { hasLandingSearchParams } from "../lib/landing-search-params";
@@ -187,7 +193,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   onPackageRequired,
 }) => {
   const t = useTranslations("searchFilter");
+  /** Country & district display keys live under `landing` (shared with hero). */
+  const tLand = useTranslations("landing");
   const tc = useTranslations("common");
+  const { locale } = useAppLocale();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -1148,6 +1157,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               <div className="rounded-2xl border border-border-soft bg-[#F8F8F8] p-3 shadow-soft">
                 <div className="relative mb-3">
                   <input
+                    key={`country-search-ph-${locale}`}
                     type="text"
                     value={countrySearch}
                     onChange={(e) => setCountrySearch(e.target.value)}
@@ -1185,7 +1195,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                             : "border-border-soft bg-white text-[#2C2C2C] hover:border-maroon/20 hover:bg-cream/70"
                         }`}
                       >
-                        <span className="text-sm font-medium">{countryValue}</span>
+                        <span className="text-sm font-medium">
+                          {isCountryOption(countryValue)
+                            ? tLand(countryMessageKey[countryValue])
+                            : countryValue}
+                        </span>
                         <span
                           className={`flex h-6 w-6 items-center justify-center rounded-md border text-[13px] font-bold transition-colors ${
                             selected
@@ -1225,7 +1239,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                       <SelectLabel>{t("districtLabel")}</SelectLabel>
                       {SRILANKA_DISTRICTS.map((name) => (
                         <SelectItem key={name} value={name}>
-                          {name}
+                          {tLand(districtMessageKey[name])}
                         </SelectItem>
                       ))}
                     </SelectGroup>

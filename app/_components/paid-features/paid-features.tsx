@@ -1,22 +1,21 @@
 "use client";
 import OnlineNowSidebar from "@/app/(pages)/people/onlineNowSidebar";
-import { useAppLocale } from "@/app/_components/i18n/locale-provider";
 import { Button } from "@/components/ui/button";
 import { PaidItem } from "@/data/paid-features/paid-features";
-
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import React from "react";
+
 const PaidFeatures = () => {
   const pathname = usePathname();
-  const { locale } = useAppLocale();
+  const t = useTranslations("paidFeatures");
 
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-4 rounded-2xl border border-border-soft bg-white px-5 py-5 shadow-card transition-all duration-300 hover:border-maroon/15 hover:shadow-card-hover">
         <p className="text-[16px] font-playfair font-semibold text-maroon">
-          Premium Features
+          {t("title")}
         </p>
         <div className="flex flex-col">
           {PaidItem.map((item, index) => (
@@ -24,9 +23,7 @@ const PaidFeatures = () => {
               <div className="bg-soft-rose w-8 h-8 rounded-full flex justify-center items-center text-maroon">
                 {item.icon}
               </div>
-              <p className="text-sm text-[#2C2C2C]">
-                {locale === "ta" ? item.titleTa : item.title}
-              </p>
+              <p className="text-sm text-[#2C2C2C]">{t(item.messageKey)}</p>
             </div>
           ))}
         </div>
@@ -36,7 +33,7 @@ const PaidFeatures = () => {
             size="secondary"
             className="w-full px-6 py-5 border-2 border-gold text-gold bg-white hover:bg-gold hover:text-white rounded-lg font-semibold transition-all duration-200"
           >
-            Get Premium
+            {t("getPremium")}
           </Button>
         </Link>
       </div>

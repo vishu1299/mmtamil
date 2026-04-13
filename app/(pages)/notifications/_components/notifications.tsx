@@ -7,8 +7,14 @@ import { IoLocationSharp } from "react-icons/io5";
 import { FaHeart } from "react-icons/fa";
 import { getuserByid } from "@/app/(pages)/profile/api/api";
 import { getInterestedUser } from "@/app/api/api";
+import { useTranslations } from "next-intl";
 
 const PAGE_SIZE = 20;
+
+type NotificationsT = (
+  key: string,
+  values?: Record<string, string | number>
+) => string;
 
 interface MatchNotification {
   id: number;
@@ -32,7 +38,7 @@ function getAge(dateOfBirth: string | null | undefined): number {
   return age;
 }
 
-function formatTimeAgo(dateStr: string | null | undefined): string {
+function formatTimeAgo(dateStr: string | null | undefined, t: NotificationsT): string {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   const now = new Date();
@@ -40,9 +46,13 @@ function formatTimeAgo(dateStr: string | null | undefined): string {
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours} hr ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+  if (diffMins < 60) return t("timeAgoMinutes", { count: diffMins });
+  if (diffHours < 24) return t("timeAgoHours", { count: diffHours });
+  if (diffDays < 7) {
+    return diffDays === 1
+      ? t("timeAgoOneDay")
+      : t("timeAgoDays", { count: diffDays });
+  }
   return d.toLocaleDateString();
 }
 
@@ -61,14 +71,16 @@ function isYesterday(dateStr: string | null | undefined): boolean {
   return d.getDate() === y.getDate() && d.getMonth() === y.getMonth() && d.getFullYear() === y.getFullYear();
 }
 
-function mapRawToNotifications(list: any[]): MatchNotification[] {
+function mapRawToNotifications(list: any[], t: NotificationsT): MatchNotification[] {
   return list.map((item: any, idx: number) => {
     const u = item?.userInterest ?? item?.user ?? item;
     const profile = u?.profile ?? {};
     const createdAt = item?.createdAt ?? item?.updatedAt ?? u?.createdAt;
     const first = profile?.firstName ?? "";
     const last = profile?.lastName ?? "";
-    const name = u?.userName ?? ([first, last].filter(Boolean).join(" ").trim() || "Someone");
+    const name =
+      u?.userName ??
+      ([first, last].filter(Boolean).join(" ").trim() || t("someone"));
     const avatar = profile?.profilePicture
       ? `${IMAGE_BASE}uploads/${profile.profilePicture}`
       : DEFAULT_AVATAR;
@@ -78,7 +90,7 @@ function mapRawToNotifications(list: any[]): MatchNotification[] {
       age: getAge(profile?.dateOfBirth ?? u?.dateOfBirth),
       distance: item?.distance ?? 0,
       avatar,
-      time: formatTimeAgo(createdAt),
+      time: formatTimeAgo(createdAt, t),
     };
   });
 }
@@ -101,27 +113,35 @@ function categorizeByDate(
   return { today, yesterday, other };
 }
 
-const PremiumCard = ({ subscribedAt, packageName }: { subscribedAt?: string; packageName?: string }) => (
-  <div className="flex items-start gap-4 border-b border-border-soft bg-gradient-to-r from-gold-light/20 to-cream/40 px-4 py-5 transition-all duration-200 hover:shadow-soft">
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-[#FFF8F0] shadow-sm">
-      <FaCrown className="text-xl text-[#D4AF37]" />
+const PremiumCard = ({
+  subscribedAt,
+  packageName,
+}: {
+  subscribedAt?: string;
+  packageName?: string;
+}) => {
+  const t = useTranslations("notifications");
+  return (
+    <div className="flex items-start gap-4 border-b border-border-soft bg-gradient-to-r from-gold-light/20 to-cream/40 px-4 py-5 transition-all duration-200 hover:shadow-soft">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-[#FFF8F0] shadow-sm">
+        <FaCrown className="text-xl text-[#D4AF37]" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-[15px] font-semibold text-[#2C2C2C]">
+          {packageName ? t("planNamed", { name: packageName }) : t("planDefault")}
+        </h3>
+        <p className="mt-0.5 text-[13px] leading-[1.4] text-[#6B6B6B]">
+          {t("premiumWelcome")}
+        </p>
+        {subscribedAt && (
+          <span className="mt-1.5 block text-xs text-[#9CA3AF]">
+            {formatTimeAgo(subscribedAt, t as NotificationsT)}
+          </span>
+        )}
+      </div>
     </div>
-    <div className="flex-1 min-w-0">
-      <h3 className="text-[15px] font-semibold text-[#2C2C2C]">
-        {packageName ? `${packageName} Plan` : "Premium Plan"}
-      </h3>
-      <p className="text-[13px] text-[#6B6B6B] mt-0.5 leading-[1.4]">
-        You&apos;ve successfully subscribed to Premium. Enjoy profile views,
-        contact views, and exclusive features.
-      </p>
-      {subscribedAt && (
-        <span className="text-xs text-[#9CA3AF] mt-1.5 block">
-          {formatTimeAgo(subscribedAt)}
-        </span>
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 const Avatar = ({ src, name }: { src: string; name: string }) => {
   const [error, setError] = useState(false);
@@ -150,40 +170,47 @@ const Avatar = ({ src, name }: { src: string; name: string }) => {
   );
 };
 
-const MatchNotificationItem = ({ notification }: { notification: MatchNotification }) => (
-  <div className="flex items-center gap-3 border-b border-border-soft px-4 py-4 transition-all duration-200 last:border-b-0 hover:bg-soft-rose/25 hover:shadow-sm">
-    <Avatar src={notification.avatar} name={notification.name} />
-    <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-2">
-        <span className="text-[14px] font-semibold text-[#2C2C2C]">
-          {notification.name}, {notification.age}
+const MatchNotificationItem = ({
+  notification,
+}: {
+  notification: MatchNotification;
+}) => {
+  const t = useTranslations("notifications");
+  return (
+    <div className="flex items-center gap-3 border-b border-border-soft px-4 py-4 transition-all duration-200 last:border-b-0 hover:bg-soft-rose/25 hover:shadow-sm">
+      <Avatar src={notification.avatar} name={notification.name} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-[14px] font-semibold text-[#2C2C2C]">
+            {notification.name}, {notification.age}
+          </span>
+          {notification.distance > 0 && (
+            <div className="flex items-center gap-0.5">
+              <IoLocationSharp className="text-xs text-[#EF4765]" />
+              <span className="text-xs text-[#6B6B6B]">
+                {t("distanceKm", { distance: notification.distance })}
+              </span>
+            </div>
+          )}
+        </div>
+        <p className="mt-0.5 text-[13px] text-[#6B6B6B]">{t("inviteMatch")}</p>
+        <span className="mt-0.5 block text-xs text-[#9CA3AF]">
+          {notification.time}
         </span>
-        {notification.distance > 0 && (
-          <div className="flex items-center gap-0.5">
-            <IoLocationSharp className="text-xs text-[#EF4765]" />
-            <span className="text-xs text-[#6B6B6B]">
-              {notification.distance} KM
-            </span>
-          </div>
-        )}
       </div>
-      <p className="text-[13px] text-[#6B6B6B] mt-0.5">
-        Invites you for a match!
-      </p>
-      <span className="text-xs text-[#9CA3AF] mt-0.5 block">
-        {notification.time}
-      </span>
+      <button
+        type="button"
+        aria-label={t("likeInterestAria")}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-maroon/20 bg-maroon text-white shadow-maroon transition-all duration-200 hover:bg-maroon-light hover:shadow-maroon-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon/40 motion-reduce:hover:translate-y-0"
+      >
+        <FaHeart className="text-lg text-white" />
+      </button>
     </div>
-    <button
-      type="button"
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-maroon/20 bg-maroon text-white shadow-maroon transition-all duration-200 hover:bg-maroon-light hover:shadow-maroon-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maroon/40 motion-reduce:hover:translate-y-0"
-    >
-      <FaHeart className="text-lg text-white" />
-    </button>
-  </div>
-);
+  );
+};
 
 const Notifications = () => {
+  const t = useTranslations("notifications");
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
@@ -209,7 +236,7 @@ const Notifications = () => {
       if (list.length === 0 || list.length < PAGE_SIZE) {
         setHasMore(false);
       }
-      const mapped = mapRawToNotifications(list);
+      const mapped = mapRawToNotifications(list, t as NotificationsT);
       const { today, yesterday, other } = categorizeByDate(list, mapped);
       setTodayList((prev) => [...prev, ...today]);
       setYesterdayList((prev) => [...prev, ...yesterday]);
@@ -220,7 +247,7 @@ const Notifications = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [userId, page, loadingMore, hasMore]);
+  }, [userId, page, loadingMore, hasMore, t]);
 
   useEffect(() => {
     const load = async () => {
@@ -258,9 +285,11 @@ const Notifications = () => {
           const createdAt = item?.createdAt ?? item?.updatedAt ?? u?.createdAt;
           const first = profile?.firstName ?? "";
           const last = profile?.lastName ?? "";
-          const name = u?.userName ?? ([first, last].filter(Boolean).join(" ").trim() || "Someone");
+          const name =
+            u?.userName ??
+            ([first, last].filter(Boolean).join(" ").trim() || t("someone"));
           const avatar = profile?.profilePicture
-            ? ( `${IMAGE_BASE}${profile.profilePicture.split("uploads/")[1]}`)
+            ? `${IMAGE_BASE}${profile.profilePicture.split("uploads/")[1]}`
             : DEFAULT_AVATAR;
           return {
             id: item?.id ?? u?.id ?? idx,
@@ -268,7 +297,7 @@ const Notifications = () => {
             age: getAge(profile?.dateOfBirth ?? u?.dateOfBirth),
             distance: item?.distance ?? 0,
             avatar,
-            time: formatTimeAgo(createdAt),
+            time: formatTimeAgo(createdAt, t as NotificationsT),
           };
         });
         const today: MatchNotification[] = [];
@@ -294,7 +323,7 @@ const Notifications = () => {
       }
     };
     load();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!hasMore || loading || loadingMore) return;
@@ -331,7 +360,9 @@ const Notifications = () => {
             {todayList.length > 0 && (
               <>
                 <div className="pt-4 pb-1 px-4">
-                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">Today</h2>
+                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">
+                    {t("sectionToday")}
+                  </h2>
                 </div>
                 {todayList.map((notification) => (
                   <MatchNotificationItem key={notification.id} notification={notification} />
@@ -342,7 +373,9 @@ const Notifications = () => {
             {yesterdayList.length > 0 && (
               <>
                 <div className="pt-6 pb-1 px-4">
-                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">Yesterday</h2>
+                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">
+                    {t("sectionYesterday")}
+                  </h2>
                 </div>
                 {yesterdayList.map((notification) => (
                   <MatchNotificationItem key={notification.id} notification={notification} />
@@ -353,7 +386,9 @@ const Notifications = () => {
             {otherList.length > 0 && (
               <>
                 <div className="pt-6 pb-1 px-4">
-                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">Older</h2>
+                  <h2 className="text-[15px] font-semibold text-[#2C2C2C]">
+                    {t("sectionOlder")}
+                  </h2>
                 </div>
                 {otherList.map((notification) => (
                   <MatchNotificationItem key={notification.id} notification={notification} />
@@ -362,8 +397,8 @@ const Notifications = () => {
             )}
 
             {!hasAny && (
-              <p className="px-4 py-8 text-center text-[#6B6B6B] text-sm">
-                No pending match invites. When someone shows interest, they&apos;ll appear here.
+              <p className="px-4 py-8 text-center text-sm text-[#6B6B6B]">
+                {t("emptyInvites")}
               </p>
             )}
 

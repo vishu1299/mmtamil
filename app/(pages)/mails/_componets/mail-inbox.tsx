@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
 import { LuUserSearch } from "react-icons/lu";
 import {
@@ -28,6 +29,7 @@ interface MailInboxProps {
 }
 
 const MailInbox: React.FC<MailInboxProps> = ({ searchQuery = "" }) => {
+  const t = useTranslations("mails");
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -131,13 +133,13 @@ const MailInbox: React.FC<MailInboxProps> = ({ searchQuery = "" }) => {
           <MdMail className="text-3xl text-maroon" />
         </div>
         <h2 className="mt-4 font-playfair text-xl font-semibold text-maroon">
-          No Messages Yet
+          {t("inboxEmptyTitle")}
         </h2>
         <p className="text-[#6B6B6B] text-sm mt-1">
-          Start connecting with your matches
+          {t("inboxEmptyHint")}
         </p>
         <div className="mt-4 flex items-center gap-2 px-6 py-2.5 bg-maroon text-white rounded-lg hover:bg-maroon/90 cursor-pointer transition-all duration-200 text-sm">
-          <p>Go to search</p>
+          <p>{t("inboxGoToSearch")}</p>
           <LuUserSearch />
         </div>
       </div>

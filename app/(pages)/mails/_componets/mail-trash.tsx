@@ -4,6 +4,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { LuUserSearch } from "react-icons/lu";
 import { MdMail, MdOutlineWatchLater } from "react-icons/md";
 import { trashMessage, MessageData } from "./api/api";
@@ -12,6 +13,8 @@ import dayjs from "dayjs";
 const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE_URL ?? "";
 
 const MailTrash = () => {
+  const t = useTranslations("mails");
+  const tc = useTranslations("common");
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,14 +38,15 @@ const MailTrash = () => {
   const formatDate = (dateString: string) => {
     const date = dayjs(dateString);
     const now = dayjs();
+    const time = date.format("hh:mm A");
 
     if (date.isSame(now, "day")) {
-      return `Today, ${date.format("hh:mm A")}`;
-    } else if (date.isSame(now.subtract(1, "day"), "day")) {
-      return `Yesterday, ${date.format("hh:mm A")}`;
-    } else {
-      return date.format("MMM DD, YYYY, hh:mm A");
+      return t("mailDateToday", { time });
     }
+    if (date.isSame(now.subtract(1, "day"), "day")) {
+      return t("mailDateYesterday", { time });
+    }
+    return date.format("MMM DD, YYYY, hh:mm A");
   };
 
   if (loading) {
@@ -65,12 +69,14 @@ const MailTrash = () => {
               {item.sender?.profile?.profilePicture ? (
                 <img
                   src={String(item.sender.profile.profilePicture).startsWith("http") ? item.sender.profile.profilePicture : `${IMAGE_BASE}${item.sender.profile.profilePicture}`}
-                  alt="User Avatar"
+                  alt={t("userAvatarAlt")}
                   className="w-10 h-10 rounded-full object-cover border-2 border-border-soft"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-soft-rose flex items-center justify-center">
-                  <span className="text-maroon text-sm font-semibold">N/A</span>
+                  <span className="text-maroon text-sm font-semibold">
+                    {tc("dash")}
+                  </span>
                 </div>
               )}
 
@@ -78,10 +84,13 @@ const MailTrash = () => {
                 <div className="flex justify-between w-full">
                   <div className="flex items-center gap-3">
                     <p className="font-playfair font-semibold text-base text-[#2C2C2C]">
-                      {item.sender?.userName || "Unknown User"}
+                      {item.sender?.userName || t("unknownUser")}
                     </p>
                     <p className="text-xs flex gap-1.5 items-center text-[#6B6B6B]">
-                      <MdMail className="text-maroon/60" /> {item.attachment?.length || 0} Attachments
+                      <MdMail className="text-maroon/60" />{" "}
+                      {t("attachmentsCount", {
+                        count: item.attachment?.length || 0,
+                      })}
                     </p>
                   </div>
                   <p className="text-xs flex gap-1.5 items-center text-[#6B6B6B]">
@@ -99,7 +108,7 @@ const MailTrash = () => {
                       <img
                         key={index}
                         src={file?.attachedfile ? `${IMAGE_BASE}${file.attachedfile}` : ""}
-                        alt={`Attachment ${index + 1}`}
+                        alt={t("attachmentAlt", { number: index + 1 })}
                         className="w-20 h-20 rounded-lg object-cover border border-border-soft"
                       />
                     ))}
@@ -115,11 +124,13 @@ const MailTrash = () => {
             <MdMail className="text-3xl text-[#6B6B6B]" />
           </div>
           <h2 className="mt-4 font-playfair text-xl font-semibold text-maroon">
-            No Trashed Messages
+            {t("trashEmptyTitle")}
           </h2>
-          <p className="text-[#6B6B6B] text-sm mt-1">Your trash is currently empty</p>
+          <p className="text-[#6B6B6B] text-sm mt-1">
+            {t("trashEmptyHint")}
+          </p>
           <div className="mt-4 flex items-center gap-2 px-6 py-2.5 bg-maroon text-white rounded-lg hover:bg-maroon/90 cursor-pointer transition-all duration-200 text-sm">
-            <p>Go to search</p>
+            <p>{t("inboxGoToSearch")}</p>
             <LuUserSearch />
           </div>
         </div>

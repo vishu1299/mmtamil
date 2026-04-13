@@ -4,93 +4,96 @@ import React, { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { isPolicyPageHref, POLICY_PAGE_NEW_TAB } from "@/lib/policy-page-links";
 import AboutUs from "./aboutus/page";
 
-const navLinks = [
-  { label: "Home", href: "/" },
-  // { label: "Search", href: "/search" },
-  { label: "Success Stories", href: "/success-stories" },
-  { label: "Rules & Policies", href: "/privacyinfo" },
-  { label: "Terms & Conditions", href: "/legal-terms" },
+const NAV_LINK_KEYS = [
+  { labelKey: "navHome" as const, href: "/" },
+  { labelKey: "navSuccessStories" as const, href: "/success-stories" },
+  { labelKey: "navAbout" as const, href: "/about" },
+  { labelKey: "navRulesPolicies" as const, href: "/privacyinfo" },
+  { labelKey: "navTermsConditions" as const, href: "/legal-terms" },
 ];
 
 const AboutHeader = () => {
+  const t = useTranslations("landing");
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream">
       <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="max-w-[1560px] w-[90%] mx-auto flex items-center justify-between py-4">
-          <Link href="/" className="flex items-center shrink-0">
+        <div className="mx-auto flex w-[90%] max-w-[1560px] items-center justify-between py-4">
+          <Link href="/" className="flex shrink-0 items-center">
             <Image
               src="/assets/mmtlogo.png"
-              alt="MM Tamil"
+              alt={t("navLogoMmTamil")}
               width={120}
               height={22}
             />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+          <nav className="hidden items-center gap-2 md:flex">
+            {NAV_LINK_KEYS.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 className="text-sm font-semibold tracking-wide transition-colors text-[#2C2C2C] hover:text-maroon"
                 {...(isPolicyPageHref(link.href) ? POLICY_PAGE_NEW_TAB : {})}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
             <Link
               href="/login"
-              className="text-maroon text-sm font-semibold border border-maroon rounded-full px-6 py-2.5 hover:bg-soft-rose transition-colors"
+              className="rounded-full border border-maroon px-6 py-2.5 text-sm font-semibold text-maroon transition-colors hover:bg-soft-rose"
             >
-              Login
+              {t("login")}
             </Link>
             <Link
               href="/loginstep"
-              className="bg-maroon text-white text-sm font-semibold rounded-full px-6 py-2.5 hover:bg-maroon/90 transition-colors"
+              className="rounded-full bg-maroon px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-maroon/90"
             >
-              Register
+              {t("register")}
             </Link>
           </nav>
 
           <button
-            className="md:hidden text-[#2C2C2C] text-2xl"
+            type="button"
+            className="text-2xl text-[#2C2C2C] md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            aria-label={t("toggleMenu")}
           >
             {menuOpen ? <HiX /> : <HiMenu />}
           </button>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden bg-white border-t border-border-soft px-6 pb-4 pt-3 flex flex-col gap-3">
-            {navLinks.map((link) => (
+          <div className="flex flex-col gap-3 border-t border-border-soft bg-white px-6 pb-4 pt-3 md:hidden">
+            {NAV_LINK_KEYS.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="text-[#2C2C2C] text-sm font-semibold hover:text-maroon"
+                className="text-sm font-semibold text-[#2C2C2C] hover:text-maroon"
                 {...(isPolicyPageHref(link.href) ? POLICY_PAGE_NEW_TAB : {})}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
             <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
-              className="text-maroon text-sm font-semibold border border-maroon rounded-full px-6 py-2 text-center"
+              className="rounded-full border border-maroon px-6 py-2 text-center text-sm font-semibold text-maroon"
             >
-              Login
+              {t("login")}
             </Link>
             <Link
               href="/loginstep"
               onClick={() => setMenuOpen(false)}
-              className="bg-maroon text-white text-sm font-semibold rounded-full px-6 py-2 text-center"
+              className="rounded-full bg-maroon px-6 py-2 text-center text-sm font-semibold text-white"
             >
-              Register
+              {t("register")}
             </Link>
           </div>
         )}

@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
 import { LuUserSearch } from "react-icons/lu";
 import { getMessageChat, MessageData } from "./api/api";
@@ -42,6 +43,7 @@ function sendMessageToMessageData(raw: any): MessageData {
 }
 
 const MailOutbox = () => {
+  const t = useTranslations("mails");
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,14 +77,15 @@ const MailOutbox = () => {
   const formatDate = (dateString: string) => {
     const date = dayjs(dateString);
     const now = dayjs();
+    const time = date.format("hh:mm A");
 
     if (date.isSame(now, "day")) {
-      return `Today, ${date.format("hh:mm A")}`;
-    } else if (date.isSame(now.subtract(1, "day"), "day")) {
-      return `Yesterday, ${date.format("hh:mm A")}`;
-    } else {
-      return date.format("MMM DD, YYYY, hh:mm A");
+      return t("mailDateToday", { time });
     }
+    if (date.isSame(now.subtract(1, "day"), "day")) {
+      return t("mailDateYesterday", { time });
+    }
+    return date.format("MMM DD, YYYY, hh:mm A");
   };
 
   if (loading) {
@@ -105,7 +108,7 @@ const MailOutbox = () => {
               {item.receiver?.profile?.profilePicture ? (
                 <img
                   src={String(item.receiver.profile.profilePicture).startsWith("http") ? item.receiver.profile.profilePicture : `${IMAGE_BASE}${item.receiver.profile.profilePicture}`}
-                  alt={item.receiver?.userName ?? "Receiver"}
+                  alt={item.receiver?.userName ?? t("receiverAlt")}
                   className="w-10 h-10 rounded-full object-cover border-2 border-soft-rose"
                 />
               ) : (
@@ -120,10 +123,13 @@ const MailOutbox = () => {
                 <div className="flex justify-between w-full">
                   <div className="flex items-center gap-3">
                     <p className="font-playfair font-semibold text-base text-[#2C2C2C]">
-                      {item.receiver?.userName || "Unknown User"}
+                      {item.receiver?.userName || t("unknownUser")}
                     </p>
                     <p className="text-xs flex gap-1.5 items-center text-[#6B6B6B]">
-                      <MdMail className="text-maroon/60" /> {item.attachment?.length || 0} Attachments
+                      <MdMail className="text-maroon/60" />{" "}
+                      {t("attachmentsCount", {
+                        count: item.attachment?.length || 0,
+                      })}
                     </p>
                   </div>
 
@@ -144,7 +150,7 @@ const MailOutbox = () => {
                       <img
                         key={i}
                         src={file?.attachedfile ? `${IMAGE_BASE}${file.attachedfile}` : ""}
-                        alt={`Attachment ${i + 1}`}
+                        alt={t("attachmentAlt", { number: i + 1 })}
                         className="w-20 h-20 rounded-lg object-cover border border-border-soft"
                       />
                     ))}
@@ -160,11 +166,13 @@ const MailOutbox = () => {
             <MdMail className="text-3xl text-maroon" />
           </div>
           <h2 className="mt-4 font-playfair text-xl font-semibold text-maroon">
-            No Sent Letters
+            {t("outboxEmptyTitle")}
           </h2>
-          <p className="text-[#6B6B6B] text-sm mt-1">Start a conversation with someone</p>
+          <p className="text-[#6B6B6B] text-sm mt-1">
+            {t("outboxEmptyHint")}
+          </p>
           <div className="mt-4 flex items-center gap-2 px-6 py-2.5 bg-maroon text-white rounded-lg hover:bg-maroon/90 cursor-pointer transition-all duration-200 text-sm">
-            <p>Go to search</p>
+            <p>{t("inboxGoToSearch")}</p>
             <LuUserSearch />
           </div>
         </div>

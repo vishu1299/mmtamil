@@ -1,4 +1,7 @@
+"use client";
+
 import React, { Suspense } from "react";
+import { useTranslations } from "next-intl";
 import SearchPage from "./SeaechPage";
 import LoadingPage from "@/app/loadingPage";
 import PaidFeatures from "@/app/_components/paid-features/paid-features";
@@ -12,15 +15,16 @@ function SearchBarFallback() {
 }
 
 const Page = () => {
+  const t = useTranslations("search");
   return (
     <Suspense fallback={<SearchBarFallback />}>
       <div className="mx-auto min-h-screen w-full max-w-[1560px] lg:w-[90%] lg:py-6">
         <div className="mb-5 rounded-2xl border border-border-soft bg-gradient-to-br from-white via-white to-cream/40 px-4 py-5 shadow-card transition-all duration-300 hover:border-maroon/15 hover:shadow-card-hover lg:px-6">
           <h1 className="font-playfair text-[28px] font-semibold tracking-tight text-maroon">
-            Discover
+            {t("discoverTitle")}
           </h1>
           <p className="mt-1 text-sm leading-relaxed text-[#6B6B6B]">
-            Explore profiles and find your perfect match
+            {t("discoverSubtitle")}
           </p>
         </div>
 
