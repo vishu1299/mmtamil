@@ -1,0 +1,28 @@
+# Optional: triggers a Vercel Production deploy on every push to `main`.
+# Setup (one time):
+# 1) Vercel → your project → Settings → Git → Deploy Hooks → create hook for branch `main`
+# 2) GitHub → repo `mmtamil` → Settings → Secrets and variables → Actions → New repository secret
+#    Name: VERCEL_DEPLOY_HOOK_URL   Value: (paste the hook URL from Vercel)
+#
+# If the secret is not set, this workflow still succeeds and only prints a skip message.
+
+name: Vercel deploy hook
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST Vercel Deploy Hook
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK_URL is not set — skipping hook (native Vercel Git integration should still deploy)."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK"
