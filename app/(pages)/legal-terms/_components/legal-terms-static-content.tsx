@@ -163,13 +163,7 @@ export function LegalTermsStaticContent() {
 
           <p className="mt-8 border-t border-border-soft pt-8 text-sm text-[#6B6B6B]">
             {t("footerIntro")}{" "}
-            <Link
-              href="/support"
-              className="font-medium text-maroon hover:underline"
-            >
-              {t("footerSupportLink")}
-            </Link>{" "}
-            {t("footerMid")}{" "}
+
             <Link
               href="/privacyinfo"
               className="font-medium text-maroon hover:underline"

@@ -99,6 +99,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   return (
     <LocaleContext.Provider value={ctxValue}>
       <NextIntlClientProvider
+        key={locale}
         locale={locale}
         messages={intlMessages}
         timeZone={appTimeZone}

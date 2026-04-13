@@ -30,11 +30,27 @@ function deepMerge<T extends Msg>(base: T, ext: Msg): T {
   return out as T;
 }
 
+/** Flat merge for `legalTerms` so static EN/TA JSON always wins predictably over core strings. */
+function mergeLegalTermsFromStatic<T extends Msg>(
+  base: T,
+  staticBlock: { legalTerms: Msg }
+): T {
+  const prev = (base.legalTerms as Msg) ?? {};
+  const next = (staticBlock.legalTerms as Msg) ?? {};
+  return {
+    ...base,
+    legalTerms: { ...prev, ...next },
+  } as T;
+}
+
+const enAfterApp = deepMerge(enCore as Msg, enApp as Msg) as Msg;
+const taAfterApp = deepMerge(taCore as Msg, taApp as Msg) as Msg;
+
 export const enMessages = deepMerge(
-  deepMerge(deepMerge(enCore as Msg, enApp as Msg), legalTermsStaticEn as Msg),
+  mergeLegalTermsFromStatic(enAfterApp, legalTermsStaticEn as { legalTerms: Msg }),
   privacyInfoStaticEn as Msg
 ) as typeof enCore & typeof enApp;
 export const taMessages = deepMerge(
-  deepMerge(deepMerge(taCore as Msg, taApp as Msg), legalTermsStaticTa as Msg),
+  mergeLegalTermsFromStatic(taAfterApp, legalTermsStaticTa as { legalTerms: Msg }),
   privacyInfoStaticTa as Msg
 ) as typeof taCore & typeof taApp;

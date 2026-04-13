@@ -22,9 +22,6 @@ const SignupHeader = () => {
           />
         </Link>
         <nav className="flex items-center gap-6">
-          <Link href="/support/#faq" className="hidden font-sfpro text-sm font-medium text-[#2C2C2C] transition-colors hover:text-[#8D1B3D] sm:inline">
-            {t("headerFaq")}
-          </Link>
           <Link
             href="/privacyinfo"
             className="hidden font-sfpro text-sm font-medium text-[#2C2C2C] transition-colors hover:text-[#8D1B3D] md:inline"
